@@ -11,5 +11,9 @@ Things to do:
 - [ ] Player movement(<- (.player.) ->)
 - [ ] Shooting (<space>)
 - [ ] Enemies and their behaviour(dynamic spawn, dodging?)
-- [ ] Pause-menu (*continue, retry*)
+
+# Gameplay vol.2
+- [ ] Pause-menu (*continue, retry*) if gamearea is not selected === pause(when paused enemies do not spawn otherwise if frozen for a long time = gamebreak/freezes/crashes)
+- [ ] Score handling == (1shot=1score)
+- [ ] Collision with deadarea(behind the player screen)/player(-1 life)
 
