@@ -17,3 +17,18 @@ Things to do:
 - [ ] Score handling == (1shot=1score) __Ioann__
 - [ ] Collision with deadarea(behind the player screen)/player(-1 life) __Ioann__
 
+# Files
+.
+├── assets
+│   ├──textures
+│   ├──mp3
+├── game.js
+├── index.html
+├── readme.md
+└── style.css
+
+
+# Project that we can work with
+[Dropbox](https://www.dropbox.com/scl/fo/d9h4rwbd06iwfpteexh64/ADnhLqf-NT7q0VbDnRBVxDQ?rlkey=uz3o5tkpd0hutri991n9k9a9d&st=7hdq52zz&dl=0)
+Or github public
+[Github](https://github.com/Run37927/spaceInvader/blob/main/index.js)
