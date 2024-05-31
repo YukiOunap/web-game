@@ -2,8 +2,8 @@ let scoreDisplay = document.getElementById('score');
 let livesDisplay = document.getElementById('lives');
 let timerDisplay = document.getElementById('timer');
 let continueButton = document.getElementById('continue-button');
-let restartButton = document.getElementById('retry-button');
-let gameArea = document.getElementById('game');
+let restartButton = document.getElementById('restart-button');
+let gameArea = document.getElementById("game")
 let pauseMenu = document.getElementById('pause-menu');
 let player = document.getElementById('player');
 let background = document.getElementById('background');
@@ -28,6 +28,10 @@ document.addEventListener("keydown", function (pressedKey) {
     }
 });
 
+continueButton.addEventListener("click", resumeGame)
+restartButton.addEventListener("click", resetAndStartGame)
+gameArea.addEventListener("click", setFocusWithoutScrolling)
+
 const gameSettings = {
     playerSpeed: 7, // frames per second
     enemySpeed: 5,
@@ -37,9 +41,20 @@ const gameSettings = {
 };
 
 function startGame() {
+    isPaused = false;
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
+}
+
+function resetAndStartGame() {
+    score = 0;
+    lives = 3;
+    elapsedTime = 0;
+    backgroundY = 0;
+    updateDisplays();
+    pauseMenu.style.display = "none";
+    startGame();
 }
 
 function gameLoop(currentTime) {
@@ -54,13 +69,19 @@ function gameLoop(currentTime) {
 
 function update(deltaTime) {
     elapsedTime += deltaTime;
-    timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
+    updateDisplays()
     
     backgroundY -= backgroundSpeed * (deltaTime / 1000);
     if (backgroundY <= -600) {
         backgroundY = 0;
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
+}
+
+function updateDisplays(){
+    scoreDisplay.textContent = `Score: ${score}`
+    livesDisplay.textContent = `Lives: ${lives}`
+    timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
 }
 
 function pauseGame() {
@@ -78,4 +99,10 @@ function resumeGame() {
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
 }
 
-startGame();
+function setFocusWithoutScrolling(){
+    continueButton.focus({
+        preventScroll:true
+    })
+}
+
+pauseGame()
