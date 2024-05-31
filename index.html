@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.cdnfonts.com/css/ocr-a-std" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <title>Space Gliders
-    </title>
+    <title>Space Gliders</title>
 </head>
-<body>
+<body class="page-background">
     <div id="game-container">
+        <div id="background"></div>
         <div id="game">
-            <div id="pause-menu" class="hidden">
-                <button id="continue-button">Continue</button>
-                <button id="restart-button">Restart</button>
+            <div id="pause-menu">
+                <button type="reset" id="restart-button" class="buttons">New Game</button><br>
+                <button id="continue-button" class="buttons">Continue</button>
             </div>
             <div id="scoreboard">
                 <div id="timer">Time: 0</div>
                 <div id="score">Score: 0</div>
-                <div id="lives">Lives: 0</div>
+                <div id="lives">Lives: 3</div>
             </div>
+            <div id="player"></div>
         </div>
     </div>
     <script src="game.js"></script>

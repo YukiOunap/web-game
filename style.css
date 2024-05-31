@@ -4,9 +4,16 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #000;
+    z-index: 0;
     color: #fff;
-    font-family:'Courier New', Courier, monospace;
+    font-family: 'OCR A Std', sans-serif;
+    font-size: 13px;
+    color: lightcyan;
+}
+
+.page-background {
+    background-color: black;
+    z-index: -20;
 }
 
 #game-container {
@@ -14,14 +21,15 @@ body {
     width: 800px;
     height: 600px;
     border: 1px solid #fff;
+    overflow: hidden;
 }
 
 #game {
-    position: absolute;
+    position: relative;
     width: 100%;
     height: 100%;
+    z-index: 1;
 }
-
 
 #scoreboard {
     position: absolute;
@@ -29,17 +37,35 @@ body {
     left: 10px;
 }
 
-
 #pause-menu {
+    display: none;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
     padding: 20px;
     text-align: center;
+    background-color: transparent;
 }
 
-.hidden{
-    display: none;
+.buttons {
+    font-family: 'OCR A Std', sans-serif;
+    margin: 50px;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+    color: lightcyan;
+}
+
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 800px;
+    height: 600px;
+    background: url('assets/textures/background.png');
+    background-repeat: repeat-y;
+    background-position: 0 0;
+    background-size: cover;
+    z-index: -1;
 }
