@@ -7,20 +7,23 @@
     <link rel="stylesheet" href="style.css">
     <title>Space Gliders</title>
 </head>
-<body class="page-background">
-    <div id="game-container">
-        <div id="background"></div>
-        <div id="game">
-            <div id="pause-menu">
-                <button type="reset" id="restart-button" class="buttons">New Game</button><br>
-                <button id="continue-button" class="buttons">Continue</button>
+<body>
+    <div id="content-wrapper">
+        <img src="assets/textures/background-logo.png" alt="Game logo" id="logo">
+        <div id="game-container">
+            <div id="background"></div>
+            <div id="game">
+                <div id="pause-menu">
+                    <button type="reset" id="restart-button" class="buttons">New Game</button><br>
+                    <button id="continue-button" class="buttons">Continue</button>
+                </div>
+                <div id="scoreboard">
+                    <div id="timer">Time: 0</div>
+                    <div id="score">Score: 0</div>
+                    <div id="lives">Lives: 3</div>
+                </div>
+                <div id="player"></div>
             </div>
-            <div id="scoreboard">
-                <div id="timer">Time: 0</div>
-                <div id="score">Score: 0</div>
-                <div id="lives">Lives: 3</div>
-            </div>
-            <div id="player"></div>
         </div>
     </div>
     <script src="game.js"></script>
