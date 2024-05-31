@@ -3,10 +3,11 @@ let livesDisplay = document.getElementById('lives');
 let timerDisplay = document.getElementById('timer');
 let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
-let gameArea = document.getElementById("game")
+let gameArea = document.getElementById('game-container')
 let pauseMenu = document.getElementById('pause-menu');
 let player = document.getElementById('player');
 let background = document.getElementById('background');
+let gameWhole = document.getElementsByTagName('body')[0];
 
 let gameInterval, enemyInterval;
 let isPaused = true;
@@ -30,7 +31,6 @@ document.addEventListener("keydown", function (pressedKey) {
 
 continueButton.addEventListener("click", resumeGame)
 restartButton.addEventListener("click", resetAndStartGame)
-gameArea.addEventListener("click", setFocusWithoutScrolling)
 
 const gameSettings = {
     playerSpeed: 7, // frames per second
@@ -42,6 +42,7 @@ const gameSettings = {
 
 function startGame() {
     isPaused = false;
+    focusOnGame();
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
@@ -89,20 +90,28 @@ function pauseGame() {
     pauseMenu.style.display = "block";
     cancelAnimationFrame(gameInterval);
     clearInterval(enemyInterval);
+    unfocusOnGame();
 }
 
 function resumeGame() {
     isPaused = false;
     pauseMenu.style.display = "none";
+    focusOnGame();
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
 }
 
-function setFocusWithoutScrolling(){
-    continueButton.focus({
-        preventScroll:true
-    })
+function focusOnGame(){
+    gameWhole.style.cursor = "none";
+    gameWhole.focus();
+    gameWhole.style.overflow = "hidden";
 }
+
+function unfocusOnGame(){
+    gameWhole.style.cursor = "auto"
+    gameWhole.style.overflow ="visible"
+}
+
 
 pauseGame()
