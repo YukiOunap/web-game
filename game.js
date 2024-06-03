@@ -1,13 +1,17 @@
+import { Player } from './player.js';
+import { Shot } from './shot.js';
+import { Enemy } from './enemy.js';
+
 let scoreDisplay = document.getElementById('score');
 let livesDisplay = document.getElementById('lives');
 let timerDisplay = document.getElementById('timer');
 let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
-let gameArea = document.getElementById('game-container')
 let pauseMenu = document.getElementById('pause-menu');
-let player = document.getElementById('player');
+let playerElement = document.getElementById('player');
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
+const gameArea = document.getElementById('game');
 
 let gameInterval, enemyInterval;
 let isPaused = true;
@@ -18,6 +22,7 @@ let elapsedTime = 0;
 let lastTime = performance.now();
 let backgroundSpeed = 30;
 let backgroundY = 0;
+let enemies = [];
 
 document.addEventListener("keydown", function (pressedKey) {
     if (pressedKey.key === "Escape" || pressedKey.key === "p" || pressedKey.key === "P") {
@@ -29,13 +34,12 @@ document.addEventListener("keydown", function (pressedKey) {
     }
 });
 
-continueButton.addEventListener("click", resumeGame)
-restartButton.addEventListener("click", resetAndStartGame)
+continueButton.addEventListener("click", resumeGame);
+restartButton.addEventListener("click", resetAndStartGame);
+
+const player = new Player(playerElement);
 
 const gameSettings = {
-    playerSpeed: 7, // frames per second
-    enemySpeed: 5,
-    bulletSpeed: 10,
     enemySpawnRate: 1000, // in ms
     bulletCoolDown: 500, // in ms
 };
@@ -46,6 +50,26 @@ function startGame() {
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
+}
+
+function createEnemies() {
+    const rows = 5;
+    const cols = 11;
+    const enemySpacing = 10;
+    const enemyWidth = 40;
+    const enemyHeight = 40;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const x = col * (enemyWidth + enemySpacing);
+            const y = row * (enemyHeight + enemySpacing);
+            const enemy = new Enemy(x, y, gameArea);
+            enemies.push(enemy);
+        }
+    }
+
+    console.log(enemies);
+
 }
 
 function resetAndStartGame() {
@@ -71,15 +95,19 @@ function gameLoop(currentTime) {
 function update(deltaTime) {
     elapsedTime += deltaTime;
     updateDisplays()
-    
-    backgroundY -= backgroundSpeed * (deltaTime / 1000);
+
+    backgroundY += backgroundSpeed * (deltaTime / 1000);
     if (backgroundY <= -600) {
         backgroundY = 0;
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
+
+    player.updateShots();
+
+    enemies.forEach(enemy => enemy.move());
 }
 
-function updateDisplays(){
+function updateDisplays() {
     scoreDisplay.textContent = `Score: ${score}`
     livesDisplay.textContent = `Lives: ${lives}`
     timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
@@ -102,16 +130,15 @@ function resumeGame() {
     enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
 }
 
-function focusOnGame(){
+function focusOnGame() {
     gameWhole.style.cursor = "none";
     gameWhole.focus();
     gameWhole.style.overflow = "hidden";
 }
 
-function unfocusOnGame(){
+function unfocusOnGame() {
     gameWhole.style.cursor = "auto"
-    gameWhole.style.overflow ="visible"
+    gameWhole.style.overflow = "visible"
 }
-
 
 pauseGame()

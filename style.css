@@ -1,7 +1,7 @@
-body{
+body {
     display: flex;
     justify-content: center;
-    align-items: center;    
+    align-items: center;
     /* height: 100vh; */
     background-color: #000;
     font-family: 'OCR A Std', sans-serif;
@@ -58,7 +58,7 @@ body{
 }
 
 #pause-menu {
-    display: none;
+    display: block;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -75,4 +75,39 @@ body{
     background-color: transparent;
     font-size: 30px;
     color: lightcyan;
+    cursor: pointer;
+}
+
+#player {
+    width: 50px;
+    height: 50px;
+    background-image: url('assets/textures/player.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    transform: translateX(-50%);
+}
+
+.shot {
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+}
+
+.enemy {
+    width: 50px;
+    height: 50px;
+    background-image: url('assets/textures/enemy.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+
+    /* test content */
+    left: 50%;
+    top: 10px;
+    transform: translateX(-50%);
 }
