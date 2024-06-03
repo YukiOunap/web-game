@@ -5,9 +5,9 @@ let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
 let gameArea = document.getElementById('game-container')
 let pauseMenu = document.getElementById('pause-menu');
-let player = document.getElementById('player');
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
+
 
 let gameInterval, enemyInterval;
 let isPaused = true;
@@ -28,6 +28,27 @@ document.addEventListener("keydown", function (pressedKey) {
         }
     }
 });
+
+document.addEventListener("DOMContentLoaded", () =>{
+    const player = new Player(gameArea);
+    document.addEventListener("keydown", (event) =>{
+        if (!isPaused){
+            switch(event.key){
+                case "ArrowLeft":
+                    player.moveLeft();
+                    break
+                case "ArrowRight":
+                    player.moveRight();
+                    break
+                case " ":
+                    player.shoot();
+                    break;
+            }
+        }
+    })
+})
+
+
 
 continueButton.addEventListener("click", resumeGame)
 restartButton.addEventListener("click", resetAndStartGame)
@@ -111,6 +132,33 @@ function focusOnGame(){
 function unfocusOnGame(){
     gameWhole.style.cursor = "auto"
     gameWhole.style.overflow ="visible"
+}
+
+class Player{
+    constructor(gameArea){
+        this.gameArea = gameArea;
+        this.element = document.createElement('div');
+        this.element.id = 'player';
+        this.gameArea.appendChild(this.element);
+        this.speed = gameSettings.playerSpeed;
+        this.positionX = this.gameArea.clientWidth/2;
+        this.updatePosition();
+    }
+
+    updatePosition(){
+        this.element.style.left = `${this.positionX}px`;
+    }
+
+    moveLeft(){
+        this.positionX = Math.max(0, this.positionX - this.speed);
+        this.updatePosition();
+    }
+    moveRight(){
+        this.positionX = Math.max(this.gameArea.clientWidth - this.element.clientWidth, this.positionX + this.speed);
+        this.updatePosition;
+    }
+
+    
 }
 
 
