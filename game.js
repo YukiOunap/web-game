@@ -76,6 +76,7 @@ function resetAndStartGame() {
     backgroundY = 0;
     updateDisplays();
     pauseMenu.style.display = "none";
+    gameArea.scrollIntoView()
     startGame();
 }
 
@@ -134,31 +135,53 @@ function unfocusOnGame(){
     gameWhole.style.overflow ="visible"
 }
 
+
+
+//====================PLAYER ITSELF AND ITS INTERACTIONS
 class Player{
     constructor(gameArea){
         this.gameArea = gameArea;
-        this.element = document.createElement('div');
-        this.element.id = 'player';
-        this.gameArea.appendChild(this.element);
+        this.player = document.createElement('div');
+        this.player.id = 'player';
+        this.gameArea.appendChild(this.player);
         this.speed = gameSettings.playerSpeed;
         this.positionX = this.gameArea.clientWidth/2;
         this.updatePosition();
     }
 
     updatePosition(){
-        this.element.style.left = `${this.positionX}px`;
+        this.player.style.left = `${this.positionX}px`;
+        console.log(this.positionX)
     }
 
     moveLeft(){
         this.positionX = Math.max(0, this.positionX - this.speed);
         this.updatePosition();
     }
+
     moveRight(){
-        this.positionX = Math.max(this.gameArea.clientWidth - this.element.clientWidth, this.positionX + this.speed);
-        this.updatePosition;
+        this.positionX = Math.min(this.gameArea.clientWidth-this.player.clientWidth, this.positionX + this.speed);
+        this.updatePosition();
     }
 
-    
+    // shoot(){
+    //     let bullet = document.createElement('div');
+    //     bullet.className = 'bullet';
+    //     bullet.style.left = `${this.positionX + this.player.clientWidth/2}px`;
+    //     bullet.style.bottom = `${this.player.clientHeight}px`;
+    //     this.gameArea.appendChild(bullet);
+
+
+    //     let bulletInterval = setInterval(() => {
+    //         let bulletPosition = parseInt(bullet.style.bottom);
+    //         if (bulletPosition >= this.gameArea.clientHeight + 240) {
+    //             bullet.remove();
+    //             clearInterval(bulletInterval);
+    //         } else {
+    //             bullet.style.bottom = `${bulletPosition + 10}px`;
+    //         }
+    //     }, 30);
+    // }
 }
 
 

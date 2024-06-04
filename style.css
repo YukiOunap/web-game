@@ -80,11 +80,20 @@ body{
 #player{
     position: absolute;
     bottom: 5px;
-    height: 75px;
-    width: 75px;
+    height: 100px;
+    width: 100px;
     background-image: url('assets/textures/player.gif');
     z-index: 10;
     background-size: contain;
     background-repeat: no-repeat;
-    
+}
+
+#bullet{
+    background-image: url('assets/textures/bullet.png');
+    bottom: 105;
+    width: 35;
+    height: 35;
+    z-index: 9;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
