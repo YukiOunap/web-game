@@ -79,21 +79,22 @@ body{
 
 #player{
     position: absolute;
-    bottom: 5px;
-    height: 100px;
-    width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    bottom: 0px;
     background-image: url('assets/textures/player.gif');
     z-index: 10;
     background-size: contain;
     background-repeat: no-repeat;
 }
 
-#bullet{
+.bullet {
+    transform: rotate(90deg);
+    position: absolute;
+    width: 35px;
+    height: 35px;
     background-image: url('assets/textures/bullet.png');
-    bottom: 105;
-    width: 35;
-    height: 35;
-    z-index: 9;
     background-size: contain;
     background-repeat: no-repeat;
+    z-index: 9;
 }

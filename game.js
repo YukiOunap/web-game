@@ -8,6 +8,17 @@ let pauseMenu = document.getElementById('pause-menu');
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
 
+const gameSettings = {
+    playerSpeed: 240,
+    enemySpeed: 5,
+    bulletSpeed: 500,
+    enemySpawnRate: 1000, // in ms
+    bulletCoolDown: 500, // in ms
+    playerWidth: 100,
+    playerHeight: 100,
+};
+
+const keysPressed = {};
 
 let gameInterval, enemyInterval;
 let isPaused = true;
@@ -19,7 +30,10 @@ let lastTime = performance.now();
 let backgroundSpeed = 30;
 let backgroundY = 0;
 
+let player;
+
 document.addEventListener("keydown", function (pressedKey) {
+    keysPressed[pressedKey.key] = true;
     if (pressedKey.key === "Escape" || pressedKey.key === "p" || pressedKey.key === "P") {
         if (isPaused) {
             resumeGame();
@@ -29,37 +43,19 @@ document.addEventListener("keydown", function (pressedKey) {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () =>{
-    const player = new Player(gameArea);
-    document.addEventListener("keydown", (event) =>{
-        if (!isPaused){
-            switch(event.key){
-                case "ArrowLeft":
-                    player.moveLeft();
-                    break
-                case "ArrowRight":
-                    player.moveRight();
-                    break
-                case " ":
-                    player.shoot();
-                    break;
-            }
-        }
-    })
-})
+document.addEventListener("keyup", function (releasedKey) {
+    keysPressed[releasedKey.key] = false;
+});
 
+document.addEventListener("DOMContentLoaded", () => {
+    player = new Player(gameArea);
+    pauseGame();
+});
 
 
 continueButton.addEventListener("click", resumeGame)
 restartButton.addEventListener("click", resetAndStartGame)
 
-const gameSettings = {
-    playerSpeed: 7, // frames per second
-    enemySpeed: 5,
-    bulletSpeed: 10,
-    enemySpawnRate: 1000, // in ms
-    bulletCoolDown: 500, // in ms
-};
 
 function startGame() {
     isPaused = false;
@@ -99,6 +95,16 @@ function update(deltaTime) {
         backgroundY = 0;
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
+
+    if (keysPressed['ArrowLeft']) {
+        player.moveLeft(deltaTime);
+    }
+    if (keysPressed['ArrowRight']) {
+        player.moveRight(deltaTime);
+    }
+    if (keysPressed[' ']) {
+        player.shoot(deltaTime);
+    }
 }
 
 function updateDisplays(){
@@ -143,45 +149,52 @@ class Player{
         this.gameArea = gameArea;
         this.player = document.createElement('div');
         this.player.id = 'player';
+        this.player.style.width = `${gameSettings.playerHeight}px`
+        this.player.style.height = `${gameSettings.playerWidth}px`
         this.gameArea.appendChild(this.player);
         this.speed = gameSettings.playerSpeed;
-        this.positionX = this.gameArea.clientWidth/2;
+        this.playerPositionX = this.gameArea.clientWidth/2-gameSettings.playerWidth/2;
         this.updatePosition();
     }
 
     updatePosition(){
-        this.player.style.left = `${this.positionX}px`;
-        console.log(this.positionX)
+        this.player.style.left = `${this.playerPositionX}px`;
+        console.log(this.playerPositionX)
     }
 
-    moveLeft(){
-        this.positionX = Math.max(0, this.positionX - this.speed);
+    moveLeft(deltaTime){ 
+        this.playerPositionX = Math.max(0, this.playerPositionX - this.speed*deltaTime/1000);
         this.updatePosition();
     }
 
-    moveRight(){
-        this.positionX = Math.min(this.gameArea.clientWidth-this.player.clientWidth, this.positionX + this.speed);
+    moveRight(deltaTime){
+        this.playerPositionX = Math.min(this.gameArea.clientWidth-this.player.clientWidth, this.playerPositionX + this.speed*deltaTime/1000);
         this.updatePosition();
     }
 
-    // shoot(){
-    //     let bullet = document.createElement('div');
-    //     bullet.className = 'bullet';
-    //     bullet.style.left = `${this.positionX + this.player.clientWidth/2}px`;
-    //     bullet.style.bottom = `${this.player.clientHeight}px`;
-    //     this.gameArea.appendChild(bullet);
+    shoot(deltaTime){
+        if(!isPaused){
+            let bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            var a = bullet.style.left = `${this.playerPositionX + gameSettings.playerWidth/2}px`;
+            console.log(a)
+            bullet.style.bottom = `${gameSettings.playerHeight}px`;
+            this.gameArea.appendChild(bullet);
 
 
-    //     let bulletInterval = setInterval(() => {
-    //         let bulletPosition = parseInt(bullet.style.bottom);
-    //         if (bulletPosition >= this.gameArea.clientHeight + 240) {
-    //             bullet.remove();
-    //             clearInterval(bulletInterval);
-    //         } else {
-    //             bullet.style.bottom = `${bulletPosition + 10}px`;
-    //         }
-    //     }, 30);
-    // }
+            let bulletInterval = setInterval(() => {
+                if(!isPaused){
+                    let bulletPosition = parseInt(bullet.style.bottom);
+                    if (bulletPosition >= this.gameArea.clientHeight + 240) {
+                        bullet.remove();
+                        clearInterval(bulletInterval);
+                    } else {
+                        bullet.style.bottom = `${bulletPosition + gameSettings.bulletSpeed*deltaTime/1000}px`;
+                }
+                }
+            }, 30);
+        }
+    }
 }
 
 
