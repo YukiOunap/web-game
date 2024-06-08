@@ -1,17 +1,18 @@
 import { Enemy } from './enemy.js';
 import { gameStates } from './game.js';
+import { Player } from './player.js';
 
 const gameArea = document.getElementById('game')
 
-export class Shot {
+export class EnemyShot {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.speed = 10;
+        this.speed = 5;
         this.gameArea = gameArea;
         this.element = document.createElement('div');
-        this.element.className = 'shot';
-        this.element.textContent = '■'; // test content
+        this.element.className = 'enemy-shot';
+        this.element.textContent = '▼'; // test content
         this.gameArea.appendChild(this.element);
         this.active = true;
         this.move();
@@ -22,9 +23,8 @@ export class Shot {
             return false;
         }
 
-        this.y -= this.speed;
-        if (this.y < 0) {
-
+        this.y += this.speed;
+        if (this.y > gameStates.gameAreaHeight) {
             this.element.remove();
             return false;
         }
@@ -35,26 +35,23 @@ export class Shot {
     }
 
     checkDestroy() {
+
         if (!this.active) {
             return false;
         }
 
         const shot = this.element.getBoundingClientRect();
+        const player = gameStates.player.element.getBoundingClientRect();
 
-        for (let enemy of gameStates.enemies) {
-            console.log(gameStates.enemies);
-            const enemyRect = enemy.element.getBoundingClientRect();
-
-            if (!(
-                enemyRect.left > shot.right || enemyRect.right < shot.left ||
-                enemyRect.top > shot.bottom || enemyRect.bottom < shot.top
-            )) {
-                console.log("destroyed");
-                this.active = false;
-                this.element.remove();
-                enemy.destroyed();
-                return false;
-            }
+        if (!(
+            player.left > shot.right || player.right < shot.left ||
+            player.top > shot.bottom || player.bottom < shot.top
+        )) {
+            console.log("lost");
+            this.active = false;
+            this.element.remove();
+            gameStates.player.destroyed();
+            return false;
         }
 
         return true;

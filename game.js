@@ -8,12 +8,18 @@ let timerDisplay = document.getElementById('timer');
 let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
 let pauseMenu = document.getElementById('pause-menu');
-let playerElement = document.getElementById('player');
-let enemyElem = document.getElementById('enemy');
+let gameOverText;
+// let playerElement = document.getElementById('player');
+// let enemyElem = document.getElementById('enemy');
 
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
+
 const gameArea = document.getElementById('game');
+const gameAreaWidth = gameArea.offsetWidth;
+const gameAreaHeight = gameArea.offsetHeight;
+const initialPlayerX = gameAreaWidth / 2;
+const initialPlayerY = gameAreaHeight - 60;
 
 let gameInterval, enemyInterval;
 let isPaused = true;
@@ -24,14 +30,20 @@ let elapsedTime = 0;
 let lastTime = performance.now();
 let backgroundSpeed = 30;
 let backgroundY = 0;
+let player;
 let enemies = [];
+let enemyShots = [];
 let playerShots = [];
-let testEnemy = new Enemy(enemyElem)
+// let testEnemy = new Enemy(enemyElem)
 
 export let gameStates = {
-    testEnemy,
+    enemies,
     score,
+    lives,
     playerShots,
+    enemyShots,
+    gameAreaHeight,
+    player,
 }
 
 document.addEventListener("keydown", function (pressedKey) {
@@ -47,8 +59,6 @@ document.addEventListener("keydown", function (pressedKey) {
 continueButton.addEventListener("click", resumeGame);
 restartButton.addEventListener("click", resetAndStartGame);
 
-let player = new Player(playerElement);
-
 const gameSettings = {
     enemySpawnRate: 1000, // in ms
     bulletCoolDown: 500, // in ms
@@ -59,38 +69,63 @@ function startGame() {
     focusOnGame();
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
-    enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
+    //enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
 }
 
 function createEnemies() {
-    const rows = 5;
-    const cols = 11;
-    const enemySpacing = 10;
+    const rows = 3;
+    const cols = 8;
+    const enemySpacing = 30;
     const enemyWidth = 40;
     const enemyHeight = 40;
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const x = col * (enemyWidth + enemySpacing);
-            const y = row * (enemyHeight + enemySpacing);
-            const enemy = new Enemy(x, y, gameArea);
+            const x = 150 + col * (enemyWidth + enemySpacing);
+            const y = 100 + row * (enemyHeight + enemySpacing);
+            const enemy = new Enemy(x, y);
+            gameArea.appendChild(enemy.element);
             enemies.push(enemy);
         }
     }
-
-    console.log(enemies);
-
 }
 
 function resetAndStartGame() {
     score = 0;
-    lives = 3;
+    gameStates.lives = 3;
     elapsedTime = 0;
     backgroundY = 0;
-    player = new Player(playerElement);
     updateDisplays();
+
+    removeElement(gameOverText);
+
+    removeElement(document.getElementById('player'));
+    createPlayer();
+
+    if (enemies.length > 0) {
+        enemies.forEach((enemy) => removeElement(enemy.element));
+    }
+    createEnemies();
+
     pauseMenu.style.display = "none";
     startGame();
+}
+
+export function createPlayer() {
+    player = new Player(initialPlayerX, initialPlayerY);
+    console.log('create player', player);
+    gameArea.appendChild(player.element);
+    gameStates.player = player;
+}
+
+function removeElement(element) {
+    console.log(element);
+    if (element) {
+        element.remove();
+        console.log(`Element with selector '${element}' has been removed.`);
+    } else {
+        console.log(`Element with selector '${element}' does not exist.`);
+    }
 }
 
 function gameLoop(currentTime) {
@@ -111,7 +146,7 @@ function gameLoop(currentTime) {
 
 function update(deltaTime) {
     elapsedTime += deltaTime;
-    updateDisplays()
+    updateDisplays();
 
     backgroundY += backgroundSpeed * (deltaTime / 1000);
     if (backgroundY <= -600) {
@@ -119,17 +154,21 @@ function update(deltaTime) {
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
 
-    console.log("MOVE!", gameStates.playerShots);
     gameStates.playerShots = gameStates.playerShots.filter(shot => shot.move());
 
-    testEnemy.move();
+    player.checkCollisionWithEnemies();
+
+    //testEnemy.move();
 
     enemies.forEach(enemy => enemy.move());
+    enemyShots.forEach(enemyShot => enemyShot.move());
 }
 
 export function updateDisplays() {
+    console.log("gamestates", gameStates.lives);
+
     scoreDisplay.textContent = `Score: ${gameStates.score}`
-    livesDisplay.textContent = `Lives: ${lives}`
+    livesDisplay.textContent = `Lives: ${gameStates.lives}`
     timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
 }
 
@@ -147,7 +186,7 @@ function resumeGame() {
     focusOnGame();
     lastTime = performance.now();
     gameInterval = requestAnimationFrame(gameLoop);
-    enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
+    //enemyInterval = setInterval(spawnEnemy, gameSettings.enemySpawnRate);
 }
 
 function focusOnGame() {
@@ -159,6 +198,18 @@ function focusOnGame() {
 function unfocusOnGame() {
     gameWhole.style.cursor = "auto"
     gameWhole.style.overflow = "visible"
+}
+
+export function gameOver() {
+    gameOverText = document.createElement('div');
+    gameOverText.setAttribute('id', 'game-over');
+    gameOverText.textContent = 'Game Over';
+    gameArea.appendChild(gameOverText);
+
+    isPaused = true;
+    cancelAnimationFrame(gameInterval);
+    clearInterval(enemyInterval);
+    unfocusOnGame();
 }
 
 pauseGame()

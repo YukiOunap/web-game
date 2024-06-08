@@ -96,7 +96,7 @@ body {
     position: absolute;
 }
 
-#enemy {
+.enemy {
     width: 50px;
     height: 50px;
     background-image: url('assets/textures/enemy.gif');
@@ -108,4 +108,26 @@ body {
     left: 50%;
     top: 10px;
     transform: translateX(-50%);
+}
+
+.enemy-shot {
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+}
+
+#game-over {
+    font-family: 'OCR A Std', sans-serif;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+    color: red;
+
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    text-align: center;
 }

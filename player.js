@@ -1,5 +1,5 @@
 import { Shot } from './shot.js';
-import { gameStates } from './game.js';
+import { gameStates, gameOver, createPlayer } from './game.js';
 
 const gameArea = document.getElementById('game')
 const gameAreaWidth = gameArea.offsetWidth;
@@ -8,8 +8,9 @@ const gameAreaHeight = gameArea.offsetHeight;
 let keyReleased = true;
 
 export class Player {
-    constructor(element) {
-        this.element = element;
+    constructor() {
+        this.element = document.createElement('div');
+        this.element.setAttribute('id', 'player');
         this.playerWidth = this.element.offsetWidth;
         this.playerHeight = this.element.offsetHeight;
         this.x = gameAreaWidth / 2;
@@ -31,7 +32,6 @@ export class Player {
     }
 
     handleKeyDown(e) {
-        console.log(keyReleased);
         if (e.key === 'ArrowLeft') {
             this.moveLeft();
         } else if (e.key === 'ArrowRight') {
@@ -66,12 +66,33 @@ export class Player {
         console.log("shots", gameStates.playerShots)
     }
 
-    checkCollisionWithEnemies(enemies) {
-        for (let enemy of enemies) {
-            if (enemy.checkCollision(this.x, this.y, this.playerWidth, this.playerHeight)) {
-                console.log('Collision detected!');
+    destroyed() {
+        this.element.remove();
+        gameStates.lives--;
+
+        if (gameStates.lives == 0) {
+            gameOver();
+        } else {
+            createPlayer();
+        }
+    }
+
+    checkCollisionWithEnemies() {
+        const player = this.element.getBoundingClientRect();
+
+        for (let enemy of gameStates.enemies) {
+            const enemyRect = enemy.element.getBoundingClientRect();
+
+            if (!(
+                enemyRect.left > player.right || enemyRect.right < player.left ||
+                enemyRect.top > player.bottom || enemyRect.bottom < player.top
+            )) {
+                console.log("lost");
+                this.active = false;
+                gameOver();
                 return true;
             }
+
         }
         return false;
     }
