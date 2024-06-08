@@ -1,8 +1,11 @@
 import { Shot } from './shot.js';
+import { gameStates } from './game.js';
 
-const gameArea = document.getElementById('game-container')
+const gameArea = document.getElementById('game')
 const gameAreaWidth = gameArea.offsetWidth;
 const gameAreaHeight = gameArea.offsetHeight;
+
+let keyReleased = true;
 
 export class Player {
     constructor(element) {
@@ -19,16 +22,23 @@ export class Player {
     init() {
         this.updatePosition();
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
-        window.addEventListener('resize', () => this.handleResize());
+        document.addEventListener('keyup', (e) => {
+            if (e.key === ' ') {
+                keyReleased = true;
+                console.log(keyReleased);
+            }
+        });
     }
 
     handleKeyDown(e) {
-        console.log('keyPressed');
+        console.log(keyReleased);
         if (e.key === 'ArrowLeft') {
             this.moveLeft();
         } else if (e.key === 'ArrowRight') {
             this.moveRight();
-        } else if (e.key === ' ') {
+        } else if (e.key === ' ' && keyReleased) {
+            keyReleased = false;
+            console.log(keyReleased);
             this.shot();
         }
     }
@@ -49,21 +59,11 @@ export class Player {
         this.element.style.left = `${this.x}px`;
     }
 
-    handleResize() {
-        this.playerWidth = this.element.offsetWidth;
-        if (this.x > window.innerWidth - this.playerWidth) {
-            this.x = window.innerWidth - this.playerWidth;
-        }
-        this.updatePosition();
-    }
-
     shot() {
         const shot = new Shot(this.x, this.y);
-        this.shots.push(shot);
-    }
-
-    updateShots() {
-        this.shots = this.shots.filter(shot => shot.move());
+        gameStates.playerShots.push(shot);
+        console.log("shot added", this.x, this.y)
+        console.log("shots", gameStates.playerShots)
     }
 
     checkCollisionWithEnemies(enemies) {

@@ -9,6 +9,8 @@ let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
 let pauseMenu = document.getElementById('pause-menu');
 let playerElement = document.getElementById('player');
+let enemyElem = document.getElementById('enemy');
+
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
 const gameArea = document.getElementById('game');
@@ -23,6 +25,14 @@ let lastTime = performance.now();
 let backgroundSpeed = 30;
 let backgroundY = 0;
 let enemies = [];
+let playerShots = [];
+let testEnemy = new Enemy(enemyElem)
+
+export let gameStates = {
+    testEnemy,
+    score,
+    playerShots,
+}
 
 document.addEventListener("keydown", function (pressedKey) {
     if (pressedKey.key === "Escape" || pressedKey.key === "p" || pressedKey.key === "P") {
@@ -37,7 +47,7 @@ document.addEventListener("keydown", function (pressedKey) {
 continueButton.addEventListener("click", resumeGame);
 restartButton.addEventListener("click", resetAndStartGame);
 
-const player = new Player(playerElement);
+let player = new Player(playerElement);
 
 const gameSettings = {
     enemySpawnRate: 1000, // in ms
@@ -77,6 +87,7 @@ function resetAndStartGame() {
     lives = 3;
     elapsedTime = 0;
     backgroundY = 0;
+    player = new Player(playerElement);
     updateDisplays();
     pauseMenu.style.display = "none";
     startGame();
@@ -87,8 +98,14 @@ function gameLoop(currentTime) {
         const deltaTime = currentTime - lastTime; // DELTA TIME
         lastTime = currentTime;
 
-        update(deltaTime);
-        gameInterval = requestAnimationFrame(gameLoop);
+        try {
+            update(deltaTime);
+            gameInterval = requestAnimationFrame(gameLoop);
+        } catch (error) {
+            console.error("Error in gameLoop:", error);
+            update(deltaTime);
+            gameInterval = requestAnimationFrame(gameLoop);
+        }
     }
 }
 
@@ -102,13 +119,16 @@ function update(deltaTime) {
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
 
-    player.updateShots();
+    console.log("MOVE!", gameStates.playerShots);
+    gameStates.playerShots = gameStates.playerShots.filter(shot => shot.move());
+
+    testEnemy.move();
 
     enemies.forEach(enemy => enemy.move());
 }
 
-function updateDisplays() {
-    scoreDisplay.textContent = `Score: ${score}`
+export function updateDisplays() {
+    scoreDisplay.textContent = `Score: ${gameStates.score}`
     livesDisplay.textContent = `Lives: ${lives}`
     timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
 }

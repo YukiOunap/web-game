@@ -1,3 +1,6 @@
+import { Enemy } from './enemy.js';
+import { gameStates } from './game.js';
+
 const gameArea = document.getElementById('game')
 
 export class Shot {
@@ -10,38 +13,56 @@ export class Shot {
         this.element.className = 'shot';
         this.element.textContent = '■'; // test content
         this.gameArea.appendChild(this.element);
-        this.updatePosition();
-    }
-
-    updatePosition() {
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
+        this.active = true;
+        this.move();
     }
 
     move() {
+        if (!this.active) {
+            return false;
+        }
+
         this.y -= this.speed;
         if (this.y < 0) {
+
             this.element.remove();
             return false;
         }
-        this.updatePosition();
+        this.element.style.left = `${this.x}px`;
+        this.element.style.top = `${this.y}px`;
+        this.checkDestroy();
         return true;
     }
 
-    checkDestroy(enemies) {
-        for (let i = 0; i < enemies.length; i++) {
-            const enemy = enemies[i];
-            if (
-                this.x < enemy.x + enemy.width &&
-                this.x + this.width > enemy.x &&
-                this.y < enemy.y + enemy.height &&
-                this.y + this.height > enemy.y
-            ) {
-                this.element.remove();
-                enemy.destroy();
-                return true;
-            }
+    checkDestroy() {
+        if (!this.active) {
+            return false;
         }
-        return false;
+
+        const shot = this.element.getBoundingClientRect();
+        const enemy = gameStates.testEnemy.element.getBoundingClientRect();
+
+        /*         console.log("CHECKED");
+                console.log("SHOT:");
+                for (const key in shot) {
+                    console.log(`${key} : ${shot[key]}`);
+                }
+                console.log("ENEMY:");
+                for (const key in enemy) {
+                    console.log(`${key} : ${enemy[key]}`);
+                } */
+
+        if (!(
+            enemy.left > shot.right || enemy.right < shot.left ||
+            enemy.top > shot.bottom || enemy.bottom < shot.top
+        )) {
+            console.log("destroyed");
+            this.active = false;
+            this.element.remove();
+            gameStates.testEnemy.destroyed();
+            return false;
+        }
+        //console.log("false");
+        return true;
     }
 }
