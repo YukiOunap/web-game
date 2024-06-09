@@ -28,6 +28,7 @@ export class Shot {
             this.element.remove();
             return false;
         }
+        console.log("shot", this.x);
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
         this.checkDestroy();
@@ -42,7 +43,6 @@ export class Shot {
         const shot = this.element.getBoundingClientRect();
 
         for (let enemy of gameStates.enemies) {
-            console.log(gameStates.enemies);
             const enemyRect = enemy.element.getBoundingClientRect();
 
             if (!(

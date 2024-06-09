@@ -38,14 +38,14 @@ export class Enemy {
     destroyed() {
         this.element.remove();
         gameStates.score += this.score;
-        console.log(gameStates.score);
+        //console.log(gameStates.score);
         updateDisplays();
     }
 
     shot() {
         const shot = new EnemyShot(this.x, this.y);
         gameStates.enemyShots.push(shot);
-        console.log("shot added", this.x, this.y)
+        //console.log("shot added", this.x, this.y)
     }
 
 }

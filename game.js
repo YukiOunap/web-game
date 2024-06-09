@@ -112,10 +112,9 @@ function resetAndStartGame() {
 }
 
 export function createPlayer() {
-    player = new Player(initialPlayerX, initialPlayerY);
-    console.log('create player', player);
+    const player = new Player(initialPlayerX, initialPlayerY);
     gameArea.appendChild(player.element);
-    gameStates.player = player;
+
 }
 
 function removeElement(element) {
@@ -156,16 +155,16 @@ function update(deltaTime) {
 
     gameStates.playerShots = gameStates.playerShots.filter(shot => shot.move());
 
-    player.checkCollisionWithEnemies();
+    gameStates.player.checkCollisionWithEnemies();
 
-    //testEnemy.move();
 
     enemies.forEach(enemy => enemy.move());
     enemyShots.forEach(enemyShot => enemyShot.move());
+
 }
 
 export function updateDisplays() {
-    console.log("gamestates", gameStates.lives);
+    //console.log("gamestates", gameStates.lives);
 
     scoreDisplay.textContent = `Score: ${gameStates.score}`
     livesDisplay.textContent = `Lives: ${gameStates.lives}`

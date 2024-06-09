@@ -8,37 +8,39 @@ const gameAreaHeight = gameArea.offsetHeight;
 let keyReleased = true;
 
 export class Player {
-    constructor() {
+    constructor(x, y) {
         this.element = document.createElement('div');
         this.element.setAttribute('id', 'player');
         this.playerWidth = this.element.offsetWidth;
         this.playerHeight = this.element.offsetHeight;
-        this.x = gameAreaWidth / 2;
-        this.y = gameAreaHeight - 60;
+        this.x = x;
+        this.y = y;
         this.speed = 10;
         this.shots = [];
         this.init();
     }
 
     init() {
+        console.log("init position", this, gameStates.player);
         this.updatePosition();
+        console.log("init position", this);
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
         document.addEventListener('keyup', (e) => {
             if (e.key === ' ') {
                 keyReleased = true;
-                console.log(keyReleased);
             }
         });
     }
 
     handleKeyDown(e) {
+        console.log("init position", this);
         if (e.key === 'ArrowLeft') {
             this.moveLeft();
         } else if (e.key === 'ArrowRight') {
             this.moveRight();
         } else if (e.key === ' ' && keyReleased) {
             keyReleased = false;
-            console.log(keyReleased);
+            console.log("init position", this);
             this.shot();
         }
     }
@@ -60,9 +62,10 @@ export class Player {
     }
 
     shot() {
+        console.log("shot position", this, gameStates.player);
         const shot = new Shot(this.x, this.y);
         gameStates.playerShots.push(shot);
-        console.log("shot added", this.x, this.y)
+        console.log("shot added", shot.x, shot.y)
         console.log("shots", gameStates.playerShots)
     }
 
@@ -78,6 +81,7 @@ export class Player {
     }
 
     checkCollisionWithEnemies() {
+        console.log("init position", this);
         const player = this.element.getBoundingClientRect();
 
         for (let enemy of gameStates.enemies) {
