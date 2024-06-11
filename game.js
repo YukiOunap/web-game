@@ -12,6 +12,7 @@ const gameSettings = {
     playerSpeed: 240,
     enemySpeed: 5,
     bulletSpeed: 500,
+    rateOfFire: 1, //seconds
     enemySpawnRate: 1000, // in ms
     bulletCoolDown: 500, // in ms
     playerWidth: 100,
@@ -155,6 +156,7 @@ class Player{
         this.speed = gameSettings.playerSpeed;
         this.playerPositionX = this.gameArea.clientWidth/2-gameSettings.playerWidth/2;
         this.updatePosition();
+        this.lastShotTime = 0;
     }
 
     updatePosition(){
@@ -172,30 +174,28 @@ class Player{
         this.updatePosition();
     }
 
-    shoot(deltaTime){
-        if(!isPaused){
+    shoot(deltaTime) {
+        const currentTime = performance.now();
+        if (!isPaused && (currentTime - this.lastShotTime >= gameSettings.bulletCoolDown)) {
+            this.lastShotTime = currentTime;
             let bullet = document.createElement('div');
             bullet.className = 'bullet';
-            var a = bullet.style.left = `${this.playerPositionX + gameSettings.playerWidth/2}px`;
-            console.log(a)
+            bullet.style.left = `${this.playerPositionX + gameSettings.playerWidth / 2}px`;
             bullet.style.bottom = `${gameSettings.playerHeight}px`;
             this.gameArea.appendChild(bullet);
 
-
-            let bulletInterval = setInterval(() => {
-                if(!isPaused){
-                    let bulletPosition = parseInt(bullet.style.bottom);
-                    if (bulletPosition >= this.gameArea.clientHeight + 240) {
-                        bullet.remove();
-                        clearInterval(bulletInterval);
-                    } else {
-                        bullet.style.bottom = `${bulletPosition + gameSettings.bulletSpeed*deltaTime/1000}px`;
+            if (!isPaused) {
+                let bulletPosition = parseInt(bullet.style.bottom);
+                if (bulletPosition >= this.gameArea.clientHeight + 240) {
+                    bullet.remove();
+                    clearInterval(bulletInterval);
+                } else {
+                    bullet.style.bottom = `${bulletPosition + gameSettings.bulletSpeed * deltaTime / 1000}px`;
                 }
-                }
-            }, 30);
+            }
         }
     }
 }
-
+//TBD Class for bullet
 
 pauseGame()
