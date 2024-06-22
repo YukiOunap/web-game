@@ -1,87 +1,79 @@
 import { Shot } from './shot.js';
-import { gameStates, gameOver, createPlayer } from './game.js';
+import { gameStates, gameOver, pauseGame } from './game.js';
 
-const gameArea = document.getElementById('game')
-const gameAreaWidth = gameArea.offsetWidth;
-const gameAreaHeight = gameArea.offsetHeight;
-
-let keyReleased = true;
+const playerWidth = 100;
+const playerHeight = 100;
+const positionY = 20;
+const bulletCoolDown = 300;
 
 export class Player {
-    constructor(x, y) {
-        this.element = document.createElement('div');
-        this.element.setAttribute('id', 'player');
-        this.playerWidth = this.element.offsetWidth;
-        this.playerHeight = this.element.offsetHeight;
-        this.x = x;
-        this.y = y;
-        this.speed = 10;
-        this.shots = [];
-        this.init();
+    constructor() {
+        this.element = document.getElementById('player');
+        this.element.style.width = `${playerWidth}px`;
+        this.element.style.height = `${playerHeight}px`;
+        this.positionX = gameStates.gameArea.clientWidth / 2;
+        this.element.style.bottom = `${positionY}px`;
+        this.speed = 250;
+        this.lastShotTime = 0;
+        this.active = true;
     }
 
-    init() {
-        console.log("init position", this, gameStates.player);
-        this.updatePosition();
-        console.log("init position", this);
-        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
-        document.addEventListener('keyup', (e) => {
-            if (e.key === ' ') {
-                keyReleased = true;
-            }
-        });
-    }
-
-    handleKeyDown(e) {
-        console.log("init position", this);
-        if (e.key === 'ArrowLeft') {
-            this.moveLeft();
-        } else if (e.key === 'ArrowRight') {
-            this.moveRight();
-        } else if (e.key === ' ' && keyReleased) {
-            keyReleased = false;
-            console.log("init position", this);
-            this.shot();
+    handleKeyDown(keysPressed, deltaTime) {
+        if (keysPressed['ArrowLeft']) {
+            this.moveLeft(deltaTime);
+        }
+        if (keysPressed['ArrowRight']) {
+            this.moveRight(deltaTime);
+        }
+        if (keysPressed[' ']) {
+            this.shoot(deltaTime);
         }
     }
 
-    moveLeft() {
-        this.x -= this.speed;
-        if (this.x < this.playerWidth / 2) this.x = this.playerWidth / 2;
-        this.updatePosition();
-    }
-
-    moveRight() {
-        this.x += this.speed;
-        if (this.x > gameAreaWidth - this.playerWidth / 2) this.x = gameAreaWidth - this.playerWidth / 2;
-        this.updatePosition();
-    }
-
     updatePosition() {
-        this.element.style.left = `${this.x}px`;
+        this.element.style.left = `${this.positionX}px`;
+        //console.log(this.positionX)
     }
 
-    shot() {
-        console.log("shot position", this, gameStates.player);
-        const shot = new Shot(this.x, this.y);
-        gameStates.playerShots.push(shot);
-        console.log("shot added", shot.x, shot.y)
-        console.log("shots", gameStates.playerShots)
+    moveLeft(deltaTime) {
+        this.positionX = Math.max(0 + playerWidth / 2, this.positionX - this.speed * deltaTime / 1000);
+        this.updatePosition();
     }
 
-    destroyed() {
-        this.element.remove();
+    moveRight(deltaTime) {
+        this.positionX = Math.min(gameStates.gameArea.clientWidth - playerWidth / 2, this.positionX + this.speed * deltaTime / 1000);
+        this.updatePosition();
+    }
+
+    shoot() {
+        const currentTime = performance.now();
+        if (currentTime - this.lastShotTime >= bulletCoolDown) {
+            this.lastShotTime = currentTime;
+            let shot = new Shot(this.positionX, positionY + playerHeight);
+            gameStates.playerShots.push(shot);
+        }
+    }
+
+    async destroyed() {
         gameStates.lives--;
+        //this.element.setAttribute('id', 'player-explode');
+        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+        console.log(this.element);
+        this.active = false;
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         if (gameStates.lives == 0) {
             gameOver();
         } else {
-            createPlayer();
+            this.element.style.backgroundImage = "url('assets/textures/player.gif')";
+            this.positionX = gameStates.gameArea.clientWidth / 2;
+            this.updatePosition();
+            this.active = true;
+            //pauseGame();
         }
     }
 
     checkCollisionWithEnemies() {
-        console.log("init position", this);
         const player = this.element.getBoundingClientRect();
 
         for (let enemy of gameStates.enemies) {
@@ -93,8 +85,9 @@ export class Player {
             )) {
                 console.log("lost");
                 this.active = false;
-                gameOver();
-                return true;
+                gameStates.lives = 1;
+                this.destroyed();
+                return;
             }
 
         }

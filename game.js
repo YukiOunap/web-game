@@ -9,13 +9,12 @@ let continueButton = document.getElementById('continue-button');
 let restartButton = document.getElementById('restart-button');
 let pauseMenu = document.getElementById('pause-menu');
 let gameOverText;
-// let playerElement = document.getElementById('player');
 // let enemyElem = document.getElementById('enemy');
 
 let background = document.getElementById('background');
 let gameWhole = document.getElementsByTagName('body')[0];
 
-const gameArea = document.getElementById('game');
+let gameArea = document.getElementById('game');
 const gameAreaWidth = gameArea.offsetWidth;
 const gameAreaHeight = gameArea.offsetHeight;
 const initialPlayerX = gameAreaWidth / 2;
@@ -30,23 +29,32 @@ let elapsedTime = 0;
 let lastTime = performance.now();
 let backgroundSpeed = 30;
 let backgroundY = 0;
-let player;
 let enemies = [];
 let enemyShots = [];
-let playerShots = [];
+let threshold = 5000;
+
 // let testEnemy = new Enemy(enemyElem)
+
+let player;
 
 export let gameStates = {
     enemies,
     score,
+    maxScore: 0,
+    elapsedTime,
     lives,
-    playerShots,
     enemyShots,
-    gameAreaHeight,
+    gameArea,
     player,
+    playerShots: [],
 }
 
-document.addEventListener("keydown", function (pressedKey) {
+gameStates.player = new Player();
+
+const keysPressed = {};
+
+function keydownHandler(pressedKey) {
+    keysPressed[pressedKey.key] = true;
     if (pressedKey.key === "Escape" || pressedKey.key === "p" || pressedKey.key === "P") {
         if (isPaused) {
             resumeGame();
@@ -54,6 +62,12 @@ document.addEventListener("keydown", function (pressedKey) {
             pauseGame();
         }
     }
+}
+
+document.addEventListener("keydown", keydownHandler);
+
+document.addEventListener("keyup", function (releasedKey) {
+    keysPressed[releasedKey.key] = false;
 });
 
 continueButton.addEventListener("click", resumeGame);
@@ -73,16 +87,19 @@ function startGame() {
 }
 
 function createEnemies() {
-    const rows = 3;
-    const cols = 8;
-    const enemySpacing = 30;
+    const rows = 2;
+    const cols = 7;
+    const enemySpacingWidth = 30;
+    const enemySpacingHeight = 20;
     const enemyWidth = 40;
     const enemyHeight = 40;
 
+    gameStates.maxScore = rows * cols;
+
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const x = 150 + col * (enemyWidth + enemySpacing);
-            const y = 100 + row * (enemyHeight + enemySpacing);
+            const x = 150 + col * (enemyWidth + enemySpacingWidth);
+            const y = 100 + row * (enemyHeight + enemySpacingHeight);
             const enemy = new Enemy(x, y);
             gameArea.appendChild(enemy.element);
             enemies.push(enemy);
@@ -99,9 +116,6 @@ function resetAndStartGame() {
 
     removeElement(gameOverText);
 
-    removeElement(document.getElementById('player'));
-    createPlayer();
-
     if (enemies.length > 0) {
         enemies.forEach((enemy) => removeElement(enemy.element));
     }
@@ -109,12 +123,6 @@ function resetAndStartGame() {
 
     pauseMenu.style.display = "none";
     startGame();
-}
-
-export function createPlayer() {
-    const player = new Player(initialPlayerX, initialPlayerY);
-    gameArea.appendChild(player.element);
-
 }
 
 function removeElement(element) {
@@ -132,14 +140,8 @@ function gameLoop(currentTime) {
         const deltaTime = currentTime - lastTime; // DELTA TIME
         lastTime = currentTime;
 
-        try {
-            update(deltaTime);
-            gameInterval = requestAnimationFrame(gameLoop);
-        } catch (error) {
-            console.error("Error in gameLoop:", error);
-            update(deltaTime);
-            gameInterval = requestAnimationFrame(gameLoop);
-        }
+        update(deltaTime);
+        gameInterval = requestAnimationFrame(gameLoop);
     }
 }
 
@@ -153,14 +155,25 @@ function update(deltaTime) {
     }
     background.style.backgroundPosition = `0px ${backgroundY}px`;
 
-    gameStates.playerShots = gameStates.playerShots.filter(shot => shot.move());
-
-    gameStates.player.checkCollisionWithEnemies();
+    gameStates.playerShots = gameStates.playerShots.filter(shot => shot.move(deltaTime));
+    //console.log("shot", Array.isArray(gameStates.playerShots), gameStates.playerShots);
 
 
     enemies.forEach(enemy => enemy.move());
+    if (elapsedTime > threshold) {
+        console.log("speed", elapsedTime, threshold);
+        threshold *= 2;
+        enemies.forEach(enemy => enemy.speedUp());
+    }
     enemyShots.forEach(enemyShot => enemyShot.move());
 
+    // update player
+    if (!gameStates.player.active) {
+        return;
+    }
+    gameStates.player.handleKeyDown(keysPressed, deltaTime);
+    gameStates.player.checkCollisionWithEnemies();
+    //console.log("shot", Array.isArray(gameStates.playerShots), gameStates.playerShots);
 }
 
 export function updateDisplays() {
@@ -171,7 +184,7 @@ export function updateDisplays() {
     timerDisplay.textContent = `Time: ${(elapsedTime / 1000).toFixed(1)}`;
 }
 
-function pauseGame() {
+export function pauseGame() {
     isPaused = true;
     pauseMenu.style.display = "block";
     cancelAnimationFrame(gameInterval);
@@ -200,6 +213,9 @@ function unfocusOnGame() {
 }
 
 export function gameOver() {
+    gameStates.player.element.style.visibility = 'hidden';
+
+    updateDisplays();
     gameOverText = document.createElement('div');
     gameOverText.setAttribute('id', 'game-over');
     gameOverText.textContent = 'Game Over';
@@ -208,6 +224,20 @@ export function gameOver() {
     isPaused = true;
     cancelAnimationFrame(gameInterval);
     clearInterval(enemyInterval);
+    document.removeEventListener("keydown", keydownHandler);
+    unfocusOnGame();
+}
+
+export function gameComplete() {
+    gameOverText = document.createElement('div');
+    gameOverText.setAttribute('id', 'game-complete');
+    gameOverText.textContent = 'Mission Complete';
+    gameArea.appendChild(gameOverText);
+
+    isPaused = true;
+    cancelAnimationFrame(gameInterval);
+    clearInterval(enemyInterval);
+    document.removeEventListener("keydown", keydownHandler);
     unfocusOnGame();
 }
 

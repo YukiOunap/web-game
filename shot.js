@@ -1,44 +1,41 @@
 import { Enemy } from './enemy.js';
 import { gameStates } from './game.js';
-
-const gameArea = document.getElementById('game')
+import { Player } from './player.js';
 
 export class Shot {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.speed = 10;
-        this.gameArea = gameArea;
+    constructor(positionX, positionY) {
+        this.positionY = positionY;
+        this.speed = 1000;
         this.element = document.createElement('div');
         this.element.className = 'shot';
-        this.element.textContent = '■'; // test content
-        this.gameArea.appendChild(this.element);
+
+        this.element.style.left = `${positionX}px`;
+        this.element.style.bottom = `${positionY}px`;
         this.active = true;
-        this.move();
+        gameStates.gameArea.appendChild(this.element);
     }
 
-    move() {
-        if (!this.active) {
-            return false;
-        }
+    move(deltaTime) {
 
-        this.y -= this.speed;
-        if (this.y < 0) {
+        this.positionY += this.speed * deltaTime / 1000;
 
+        if (this.positionY > gameStates.gameArea.clientHeight) {
             this.element.remove();
             return false;
         }
-        console.log("shot", this.x);
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
+        this.element.style.bottom = `${this.positionY}px`;
         this.checkDestroy();
+
+
         return true;
+
     }
 
     checkDestroy() {
         if (!this.active) {
-            return false;
+            return;
         }
+        console.log("shot", this.element, this.positionY);
 
         const shot = this.element.getBoundingClientRect();
 
@@ -53,10 +50,7 @@ export class Shot {
                 this.active = false;
                 this.element.remove();
                 enemy.destroyed();
-                return false;
             }
         }
-
-        return true;
     }
 }

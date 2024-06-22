@@ -8,11 +8,11 @@ export class EnemyShot {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.speed = 5;
+        this.speed = 10;
         this.gameArea = gameArea;
         this.element = document.createElement('div');
         this.element.className = 'enemy-shot';
-        this.element.textContent = '▼'; // test content
+        //this.element.textContent = '▼'; // test content
         this.gameArea.appendChild(this.element);
         this.active = true;
         this.move();
@@ -36,8 +36,8 @@ export class EnemyShot {
 
     checkDestroy() {
 
-        if (!this.active) {
-            return false;
+        if (!gameStates.player.active) {
+            return;
         }
 
         const shot = this.element.getBoundingClientRect();
@@ -48,6 +48,7 @@ export class EnemyShot {
             player.top > shot.bottom || player.bottom < shot.top
         )) {
             console.log("lost");
+            this.element.remove();
             this.active = false;
             this.element.remove();
             gameStates.player.destroyed();

@@ -79,21 +79,31 @@ body {
 }
 
 #player {
-    width: 50px;
-    height: 50px;
     background-image: url('assets/textures/player.gif');
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
-    left: 50%;
-    bottom: 10px;
     transform: translateX(-50%);
+    left: 50%;
 }
 
-.shot {
+#player-explode {
+    background-image: url('assets/textures/explosion.gif');
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+}
+
+.shot {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background-image: url('assets/textures/bullet.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 9;
 }
 
 .enemy {
@@ -111,6 +121,10 @@ body {
 }
 
 .enemy-shot {
+    transform: rotate(90deg);
+    width: 35px;
+    height: 35px;
+    background-image: url('assets/textures/bulletEnemy.png');
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
@@ -122,6 +136,22 @@ body {
     background-color: transparent;
     font-size: 30px;
     color: red;
+
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    text-align: center;
+}
+
+#game-complete {
+    font-family: 'OCR A Std', sans-serif;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+    color: rgb(255, 217, 0);
 
     display: block;
     position: absolute;
