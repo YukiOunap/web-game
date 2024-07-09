@@ -35,7 +35,7 @@ export class Shot {
         if (!this.active) {
             return;
         }
-        console.log("shot", this.element, this.positionY);
+        //console.log("shot", this.element, this.positionY);
 
         const shot = this.element.getBoundingClientRect();
 
@@ -51,6 +51,20 @@ export class Shot {
                 this.element.remove();
                 enemy.destroyed();
             }
+        }
+
+        if (!gameStates.ufo) {
+            return;
+        }
+        const ufoRect = gameStates.ufo.element.getBoundingClientRect();
+        if (!(
+            ufoRect.left > shot.right || ufoRect.right < shot.left ||
+            ufoRect.top > shot.bottom || ufoRect.bottom < shot.top
+        )) {
+            console.log("destroyed");
+            this.active = false;
+            this.element.remove();
+            gameStates.ufo.destroyed();
         }
     }
 }

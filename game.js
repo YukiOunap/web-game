@@ -1,6 +1,8 @@
 import { Player } from './player.js';
 import { Shot } from './shot.js';
 import { Enemy } from './enemy.js';
+import { UFO } from './ufo.js';
+import { Wall } from './wall.js';
 
 let scoreDisplay = document.getElementById('score');
 let livesDisplay = document.getElementById('lives');
@@ -20,6 +22,8 @@ const gameAreaHeight = gameArea.offsetHeight;
 const initialPlayerX = gameAreaWidth / 2;
 const initialPlayerY = gameAreaHeight - 60;
 
+const ufoSpawnRate = 0.001;
+
 let gameInterval, enemyInterval;
 let isPaused = true;
 let score = 0;
@@ -32,15 +36,23 @@ let backgroundY = 0;
 let enemies = [];
 let enemyShots = [];
 let threshold = 5000;
+let numberOfEnemies;
+let destroyedEnemies = 0;
+let ufo = 0;
+let walls = [];
 
 // let testEnemy = new Enemy(enemyElem)
 
 let player;
 
 export let gameStates = {
+    gameArea,
     enemies,
+    numberOfEnemies,
+    destroyedEnemies,
+    ufo,
+    walls,
     score,
-    maxScore: 0,
     elapsedTime,
     lives,
     enemyShots,
@@ -89,16 +101,15 @@ function startGame() {
 function createEnemies() {
     const rows = 2;
     const cols = 7;
-    const enemySpacingWidth = 30;
-    const enemySpacingHeight = 20;
+    const enemySpacingWidth = 60;
+    const enemySpacingHeight = 40;
     const enemyWidth = 40;
     const enemyHeight = 40;
-
-    gameStates.maxScore = rows * cols;
+    gameStates.numberOfEnemies = rows * cols;
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const x = 150 + col * (enemyWidth + enemySpacingWidth);
+            const x = 100 + col * (enemyWidth + enemySpacingWidth);
             const y = 100 + row * (enemyHeight + enemySpacingHeight);
             const enemy = new Enemy(x, y);
             gameArea.appendChild(enemy.element);
@@ -107,19 +118,38 @@ function createEnemies() {
     }
 }
 
+function getWalls() {
+    const wallElements = document.getElementsByClassName('wall');
+    console.log(wallElements);
+    gameStates.walls = Array.from(wallElements).map(el => new Wall(el));
+    console.log(gameStates.walls);
+}
+
 function resetAndStartGame() {
-    score = 0;
+    gameStates.score = 0;
     gameStates.lives = 3;
     elapsedTime = 0;
     backgroundY = 0;
     updateDisplays();
+    gameStates.destroyedEnemies = 0;
 
     removeElement(gameOverText);
+    console.log("test", gameStates.enemies);
 
-    if (enemies.length > 0) {
-        enemies.forEach((enemy) => removeElement(enemy.element));
+    if (gameStates.enemies.length > 0) {
+        gameStates.enemies.forEach((enemy) => {
+            if (enemy.element) {
+                enemy.element.remove();
+            }
+        });
+    }
+
+    if (gameStates.enemyShots.length > 0) {
+        gameStates.enemyShots.forEach((shot) => removeElement(shot.element));
     }
     createEnemies();
+
+    getWalls();
 
     pauseMenu.style.display = "none";
     startGame();
@@ -160,12 +190,18 @@ function update(deltaTime) {
 
 
     enemies.forEach(enemy => enemy.move());
-    if (elapsedTime > threshold) {
-        console.log("speed", elapsedTime, threshold);
-        threshold *= 2;
-        enemies.forEach(enemy => enemy.speedUp());
-    }
     enemyShots.forEach(enemyShot => enemyShot.move());
+
+    if (!gameStates.ufo.active && Math.random() < ufoSpawnRate) {
+        console.log(`UFO`);
+        const tmp = Math.random().toFixed(1)
+        const ufoDirection = tmp > 0.5 ? -1 : 1;
+        console.log("random", tmp, ufoDirection);
+        gameStates.ufo = new UFO(ufoDirection);
+        gameArea.appendChild(gameStates.ufo.element);
+    } else if (gameStates.ufo.active) {
+        gameStates.ufo.move();
+    }
 
     // update player
     if (!gameStates.player.active) {

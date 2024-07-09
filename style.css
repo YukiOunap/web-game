@@ -107,17 +107,12 @@ body {
 }
 
 .enemy {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     background-image: url('assets/textures/enemy.gif');
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
-
-    /* test content */
-    left: 50%;
-    top: 10px;
-    transform: translateX(-50%);
 }
 
 .enemy-shot {
@@ -128,6 +123,39 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
+}
+
+.ufo {
+    width: 50px;
+    height: 30px;
+    background-image: url('assets/textures/ufo.gif');
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 90%;
+    margin: 0 auto;
+    position: relative;
+    top: 450px;
+}
+
+.wall-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.wall {
+    height: 50px;
+    width: auto;
+    background-image: url('assets/textures/wall/wallLife2.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    aspect-ratio: 1;
 }
 
 #game-over {

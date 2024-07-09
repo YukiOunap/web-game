@@ -1,10 +1,10 @@
 import { Shot } from './shot.js';
 import { gameStates, gameOver, pauseGame } from './game.js';
 
-const playerWidth = 100;
-const playerHeight = 100;
-const positionY = 20;
-const bulletCoolDown = 300;
+const playerWidth = 60;
+const playerHeight = 60;
+const positionY = 0;
+const bulletCoolDown = 500;
 
 export class Player {
     constructor() {
@@ -60,7 +60,7 @@ export class Player {
         this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
         console.log(this.element);
         this.active = false;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         if (gameStates.lives == 0) {
             gameOver();

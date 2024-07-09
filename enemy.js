@@ -5,8 +5,8 @@ const gameArea = document.getElementById('game');
 const gameAreaWidth = gameArea.offsetWidth;
 const gameAreaHeight = gameArea.offsetHeight;
 
-let shootRate = 20;
-let enemySpeed = 50;
+let shootRate = 15;
+let enemySpeed = 25;
 
 export class Enemy {
     constructor(x, y) {
@@ -41,19 +41,28 @@ export class Enemy {
     }
 
     speedUp() {
-        enemySpeed += 2;
-        shootRate += 2;
-        console.log("speed up", this)
+        enemySpeed += 1;
+        shootRate += 1;
+        //console.log("speed up", this)
     }
 
-    destroyed() {
-        this.element.remove();
+    async destroyed() {
+        if (!this.active) {
+            return;
+        }
+
         this.active = false;
+        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.element.remove();
         gameStates.score += this.score;
-        //console.log(gameStates.score);
         updateDisplays();
 
-        if (gameStates.score == gameStates.maxScore * 100) {
+        gameStates.enemies.forEach(enemy => enemy.speedUp());
+
+        gameStates.destroyedEnemies++;
+        console.log(gameStates.destroyedEnemies, gameStates.numberOfEnemies);
+        if (gameStates.destroyedEnemies == gameStates.numberOfEnemies) {
             gameComplete();
         }
     }

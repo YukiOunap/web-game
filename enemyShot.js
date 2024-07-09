@@ -24,18 +24,45 @@ export class EnemyShot {
         }
 
         this.y += this.speed;
-        if (this.y > gameStates.gameAreaHeight) {
+
+        if (this.y > gameStates.gameArea.offsetHeight) {
             this.element.remove();
             return false;
         }
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
-        this.checkDestroy();
+
+        if (gameStates.walls.length > 0) {
+            gameStates.walls.forEach(wall => this.checkDestroyWall(wall));
+        }
+        this.checkDestroyPlayer();
         return true;
     }
 
-    checkDestroy() {
+    async checkDestroyWall(wall) {
 
+        if (!wall.active) {
+            return;
+        }
+
+        const shot = this.element.getBoundingClientRect();
+
+        if (!(
+            wall.boundingClientRect.left > shot.right || wall.boundingClientRect.right < shot.left ||
+            wall.boundingClientRect.top > shot.bottom || wall.boundingClientRect.bottom < shot.top
+        )) {
+            this.active = false;
+            this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+            wall.damaged();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            this.element.remove();
+            return false;
+        }
+
+        return true;
+    }
+
+    checkDestroyPlayer() {
         if (!gameStates.player.active) {
             return;
         }
@@ -47,10 +74,8 @@ export class EnemyShot {
             player.left > shot.right || player.right < shot.left ||
             player.top > shot.bottom || player.bottom < shot.top
         )) {
-            console.log("lost");
             this.element.remove();
             this.active = false;
-            this.element.remove();
             gameStates.player.destroyed();
             return false;
         }
