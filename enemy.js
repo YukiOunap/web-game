@@ -1,49 +1,47 @@
-import { gameStates, updateDisplays, gameComplete } from './game.js';
+import { gameStates, updateDisplays, gameOver } from './game.js';
 import { EnemyShot } from './enemyShot.js';
 
 const gameArea = document.getElementById('game');
-const gameAreaWidth = gameArea.offsetWidth;
-const gameAreaHeight = gameArea.offsetHeight;
 
-let shootRate = 15;
-let enemySpeed = 25;
+let enemySpeed = 100;
+let enemyShootRate = 40;
 
 export class Enemy {
-    constructor(x, y) {
+    constructor(positionX, positionY) {
+        // constants
         this.element = document.createElement('div');
         this.element.className = 'enemy';
-
-        this.direction = 1;
-
-        this.enemyWidth = this.element.offsetWidth;
-        this.enemyHeight = this.element.offsetHeight;
-
-        this.x = x;
-        this.y = y;
-
         this.score = 100;
 
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.direction = 1;
         this.active = true;
+        this.init();
     }
 
-    move() {
-        if (this.x < 0 || this.x > gameAreaWidth) {
-            this.direction *= -1;
-            this.y += 50;
-        }
-        this.x += enemySpeed / 10 * this.direction;
-        this.element.style.left = `${this.x}px`;
-        this.element.style.top = `${this.y}px`;
+    init() {
+        enemySpeed = 100;
+        enemyShootRate = 150;
+    }
 
-        if (Math.random() * 10000 < shootRate) {
+    move(deltaTime) {
+        if (this.positionX < 0 || this.positionX > gameArea.offsetWidth - this.element.offsetWidth) {
+            this.direction *= -1;
+            this.positionY += 40;
+        }
+        this.positionX += this.direction * enemySpeed * deltaTime / 1000;
+        this.element.style.left = `${this.positionX}px`;
+        this.element.style.top = `${this.positionY}px`;
+
+        if (Math.random() * 100000 < enemyShootRate) {
             this.shot();
         }
     }
 
     speedUp() {
-        enemySpeed += 1;
-        shootRate += 1;
-        //console.log("speed up", this)
+        enemySpeed += 3;
+        enemyShootRate += 5;
     }
 
     async destroyed() {
@@ -51,19 +49,18 @@ export class Enemy {
             return;
         }
 
+        // destroy this enemy (show explosion effect)
         this.active = false;
         this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
         await new Promise(resolve => setTimeout(resolve, 500));
+
         this.element.remove();
         gameStates.score += this.score;
         updateDisplays();
-
-        gameStates.enemies.forEach(enemy => enemy.speedUp());
-
         gameStates.destroyedEnemies++;
-        console.log(gameStates.destroyedEnemies, gameStates.numberOfEnemies);
+
         if (gameStates.destroyedEnemies == gameStates.numberOfEnemies) {
-            gameComplete();
+            gameOver('game-complete');
         }
     }
 
@@ -72,9 +69,8 @@ export class Enemy {
             return;
         }
 
-        const shot = new EnemyShot(this.x, this.y);
+        const shot = new EnemyShot(this.positionX, this.positionY);
         gameStates.enemyShots.push(shot);
-        //console.log("shot added", this.x, this.y)
     }
 
 }

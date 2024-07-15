@@ -1,33 +1,32 @@
 import { gameStates, updateDisplays } from './game.js';
 
-const ufoSpeed = 8;
-const ufoScore = 1000;
+const gameArea = document.getElementById('game');
 
 export class UFO {
     constructor(direction) {
+        // constants
         this.element = document.createElement('div');
         this.element.className = 'ufo';
+        this.element.style.top = `20px`;
+        this.speed = 200;
+        this.score = 2000;
 
         this.direction = direction;
-
-        this.enemyWidth = this.element.offsetWidth;
-        this.enemyHeight = this.element.offsetHeight;
-
-        this.x = this.direction > 0 ? 0 : gameStates.gameArea.offsetWidth;
+        this.x = this.direction > 0 ? 0 : gameArea.offsetWidth; // set start position depending on its movement direction
         this.element.style.left = `${this.x}px`;
-        this.element.style.top = `20px`;
-
         this.active = true;
     }
 
-    move() {
-        if (this.direction == 1 && this.x >= gameStates.gameArea.offsetWidth) {
+    move(deltaTime) {
+        this.x += this.speed * this.direction * deltaTime / 1000;
+        this.element.style.left = `${this.x}px`;
+
+        // remove UFO when it is outside of game area
+        if (this.direction == 1 && this.x >= gameArea.offsetWidth) {
             this.disappear();
         } else if (this.direction == -1 && this.x <= 0) {
             this.disappear();
         }
-        this.x += ufoSpeed * this.direction;
-        this.element.style.left = `${this.x}px`;
     }
 
     disappear() {
@@ -36,11 +35,13 @@ export class UFO {
     }
 
     async destroyed() {
-        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+        // destroy UFO (show explosion effect)
         this.active = false;
+        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
         await new Promise(resolve => setTimeout(resolve, 500));
+
         this.element.remove();
-        gameStates.score += ufoScore;
+        gameStates.score += this.score;
         updateDisplays();
     }
 }

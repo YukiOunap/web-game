@@ -1,65 +1,65 @@
-import { Enemy } from './enemy.js';
 import { gameStates } from './game.js';
-import { Player } from './player.js';
 
 const gameArea = document.getElementById('game')
 
 export class EnemyShot {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.speed = 10;
-        this.gameArea = gameArea;
+        // constants
         this.element = document.createElement('div');
         this.element.className = 'enemy-shot';
-        //this.element.textContent = '▼'; // test content
-        this.gameArea.appendChild(this.element);
+        this.x = x;
+        this.speed = 500;
+
+        this.y = y;
         this.active = true;
-        this.move();
+
+        gameArea.appendChild(this.element);
     }
 
-    move() {
+    move(deltaTime) {
         if (!this.active) {
             return false;
         }
 
-        this.y += this.speed;
-
-        if (this.y > gameStates.gameArea.offsetHeight) {
+        this.y += this.speed * deltaTime / 1000;
+        if (this.y > gameArea.offsetHeight) {
             this.element.remove();
             return false;
         }
         this.element.style.left = `${this.x}px`;
         this.element.style.top = `${this.y}px`;
 
-        if (gameStates.walls.length > 0) {
-            gameStates.walls.forEach(wall => this.checkDestroyWall(wall));
-        }
+        this.checkDestroyWalls();
         this.checkDestroyPlayer();
         return true;
     }
 
-    async checkDestroyWall(wall) {
-
-        if (!wall.active) {
+    async checkDestroyWalls() {
+        if (gameStates.walls.length < 0) {
             return;
         }
 
-        const shot = this.element.getBoundingClientRect();
+        for (let wall of gameStates.walls) {
+            const shotRect = this.element.getBoundingClientRect();
+            // adjust shot hit area
+            const shotHitBox = this.adjustShotArea(shotRect);
 
-        if (!(
-            wall.boundingClientRect.left > shot.right || wall.boundingClientRect.right < shot.left ||
-            wall.boundingClientRect.top > shot.bottom || wall.boundingClientRect.bottom < shot.top
-        )) {
-            this.active = false;
-            this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
-            wall.damaged();
-            await new Promise(resolve => setTimeout(resolve, 500));
-            this.element.remove();
-            return false;
+            const wallRect = wall.boundingClientRect;
+
+            if (wall.active && this.active &&
+                !(
+                    wallRect.left > shotHitBox.right || wallRect.right < shotHitBox.left ||
+                    wallRect.top > shotHitBox.bottom || wallRect.bottom < shotHitBox.top
+                )) {
+                // destroy the wall (show explosion effect)
+                this.active = false;
+                wall.damaged();
+                this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                this.element.remove();
+            }
         }
-
-        return true;
     }
 
     checkDestroyPlayer() {
@@ -67,19 +67,28 @@ export class EnemyShot {
             return;
         }
 
-        const shot = this.element.getBoundingClientRect();
+        const shotRect = this.element.getBoundingClientRect();
+        // adjust shot hit area
+        const shotHitBox = this.adjustShotArea(shotRect);
+
         const player = gameStates.player.element.getBoundingClientRect();
 
         if (!(
-            player.left > shot.right || player.right < shot.left ||
-            player.top > shot.bottom || player.bottom < shot.top
+            player.left > shotHitBox.right || player.right < shotHitBox.left ||
+            player.top > shotHitBox.bottom || player.bottom < shotHitBox.top
         )) {
             this.element.remove();
             this.active = false;
             gameStates.player.destroyed();
-            return false;
         }
+    }
 
-        return true;
+    adjustShotArea(shotRect) {
+        return {
+            left: shotRect.left,
+            right: shotRect.right - 5,
+            top: shotRect.top - 5,
+            bottom: shotRect.bottom
+        };
     }
 }

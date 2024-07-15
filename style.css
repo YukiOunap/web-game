@@ -57,8 +57,7 @@ body {
     left: 10px;
 }
 
-#pause-menu {
-    display: block;
+.menu {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -66,6 +65,15 @@ body {
     padding: 20px;
     text-align: center;
     background-color: transparent;
+    z-index: 10;
+}
+
+#start-menu {
+    display: block;
+}
+
+#pause-menu {
+    display: none;
 }
 
 .buttons {
@@ -78,8 +86,36 @@ body {
     cursor: pointer;
 }
 
+#game-over {
+    display: none;
+    color: red;
+    font-family: 'OCR A Std', sans-serif;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+}
+
+#game-complete {
+    font-family: 'OCR A Std', sans-serif;
+    border: none;
+    background-color: transparent;
+    font-size: 30px;
+    color: rgb(255, 217, 0);
+
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    text-align: center;
+}
+
 #player {
     background-image: url('assets/textures/player.gif');
+    width: 60px;
+    height: 60px;
+    bottom: 0px;
     background-size: contain;
     background-repeat: no-repeat;
     position: absolute;
@@ -107,8 +143,8 @@ body {
 }
 
 .enemy {
-    width: 45px;
-    height: 45px;
+    width: 35px;
+    height: 35px;
     background-image: url('assets/textures/enemy.gif');
     background-size: contain;
     background-repeat: no-repeat;
@@ -156,36 +192,4 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     aspect-ratio: 1;
-}
-
-#game-over {
-    font-family: 'OCR A Std', sans-serif;
-    border: none;
-    background-color: transparent;
-    font-size: 30px;
-    color: red;
-
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    text-align: center;
-}
-
-#game-complete {
-    font-family: 'OCR A Std', sans-serif;
-    border: none;
-    background-color: transparent;
-    font-size: 30px;
-    color: rgb(255, 217, 0);
-
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    text-align: center;
 }

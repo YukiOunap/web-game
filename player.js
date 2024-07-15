@@ -1,96 +1,80 @@
 import { Shot } from './shot.js';
-import { gameStates, gameOver, pauseGame } from './game.js';
+import { gameStates, gameOver } from './game.js';
 
-const playerWidth = 60;
-const playerHeight = 60;
-const positionY = 0;
-const bulletCoolDown = 500;
+const gameArea = document.getElementById('game');
 
 export class Player {
     constructor() {
+        // constants
         this.element = document.getElementById('player');
-        this.element.style.width = `${playerWidth}px`;
-        this.element.style.height = `${playerHeight}px`;
-        this.positionX = gameStates.gameArea.clientWidth / 2;
-        this.element.style.bottom = `${positionY}px`;
-        this.speed = 250;
+        this.width = this.element.clientWidth;
+        this.height = this.element.clientHeight;
+        this.bulletCoolDown = 400;
+        this.playerSpeed = 300;
+
+        this.init();
+    }
+
+    init() {
+        this.element.style.backgroundImage = "url('assets/textures/player.gif')";
+        this.positionX = gameArea.clientWidth / 2;
         this.lastShotTime = 0;
         this.active = true;
     }
 
-    handleKeyDown(keysPressed, deltaTime) {
+    move(keysPressed, deltaTime) {
         if (keysPressed['ArrowLeft']) {
-            this.moveLeft(deltaTime);
+            this.positionX = Math.max(0 + this.width / 2, this.positionX - this.playerSpeed * deltaTime / 1000);
         }
         if (keysPressed['ArrowRight']) {
-            this.moveRight(deltaTime);
+            this.positionX = Math.min(gameArea.clientWidth - this.width / 2, this.positionX + this.playerSpeed * deltaTime / 1000);
         }
-        if (keysPressed[' ']) {
-            this.shoot(deltaTime);
-        }
+        this.updatePosition();
     }
 
     updatePosition() {
         this.element.style.left = `${this.positionX}px`;
-        //console.log(this.positionX)
-    }
-
-    moveLeft(deltaTime) {
-        this.positionX = Math.max(0 + playerWidth / 2, this.positionX - this.speed * deltaTime / 1000);
-        this.updatePosition();
-    }
-
-    moveRight(deltaTime) {
-        this.positionX = Math.min(gameStates.gameArea.clientWidth - playerWidth / 2, this.positionX + this.speed * deltaTime / 1000);
-        this.updatePosition();
     }
 
     shoot() {
         const currentTime = performance.now();
-        if (currentTime - this.lastShotTime >= bulletCoolDown) {
+        if (this.active && currentTime - this.lastShotTime >= this.bulletCoolDown) {
             this.lastShotTime = currentTime;
-            let shot = new Shot(this.positionX, positionY + playerHeight);
+            let shot = new Shot(this.positionX, this.height);
             gameStates.playerShots.push(shot);
         }
     }
 
-    async destroyed() {
-        gameStates.lives--;
-        //this.element.setAttribute('id', 'player-explode');
-        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
-        console.log(this.element);
-        this.active = false;
-        await new Promise(resolve => setTimeout(resolve, 500));
+    checkCollisionWithEnemy(enemy) {
+        const enemyRect = enemy.element.getBoundingClientRect();
+        const playerRect = this.element.getBoundingClientRect();
 
-        if (gameStates.lives == 0) {
-            gameOver();
-        } else {
-            this.element.style.backgroundImage = "url('assets/textures/player.gif')";
-            this.positionX = gameStates.gameArea.clientWidth / 2;
-            this.updatePosition();
-            this.active = true;
-            //pauseGame();
+        if (!(
+            enemyRect.left > playerRect.right || enemyRect.right < playerRect.left ||
+            enemyRect.top > playerRect.bottom || enemyRect.bottom < playerRect.top
+        )) {
+            this.active = false;
+            gameStates.lives = 1;
+            this.destroyed();
         }
     }
 
-    checkCollisionWithEnemies() {
-        const player = this.element.getBoundingClientRect();
+    async destroyed() {
+        // destroy current player (show explosion effect)
+        gameStates.lives--;
+        this.active = false;
+        this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
+        await new Promise(resolve => setTimeout(resolve, 300));
 
-        for (let enemy of gameStates.enemies) {
-            const enemyRect = enemy.element.getBoundingClientRect();
-
-            if (!(
-                enemyRect.left > player.right || enemyRect.right < player.left ||
-                enemyRect.top > player.bottom || enemyRect.bottom < player.top
-            )) {
-                console.log("lost");
-                this.active = false;
-                gameStates.lives = 1;
-                this.destroyed();
-                return;
-            }
-
+        // check if new player respawn
+        if (gameStates.lives == 0) {
+            this.element.style.backgroundImage = "none";
+            gameOver('game-over');
+        } else {
+            this.element.style.backgroundImage = "url('assets/textures/player.gif')";
+            this.positionX = gameArea.clientWidth / 2;
+            this.updatePosition();
+            this.active = true;
         }
-        return false;
     }
 }

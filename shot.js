@@ -1,67 +1,73 @@
-import { Enemy } from './enemy.js';
 import { gameStates } from './game.js';
-import { Player } from './player.js';
+
+const gameArea = document.getElementById('game');
 
 export class Shot {
     constructor(positionX, positionY) {
-        this.positionY = positionY;
-        this.speed = 1000;
+        // constants
         this.element = document.createElement('div');
         this.element.className = 'shot';
-
         this.element.style.left = `${positionX}px`;
+        this.speed = 1200;
+
+        this.positionY = positionY;
         this.element.style.bottom = `${positionY}px`;
         this.active = true;
-        gameStates.gameArea.appendChild(this.element);
+
+        gameArea.appendChild(this.element);
     }
 
     move(deltaTime) {
-
         this.positionY += this.speed * deltaTime / 1000;
 
-        if (this.positionY > gameStates.gameArea.clientHeight) {
+        if (this.positionY > gameArea.clientHeight) {
+            this.active = false;
             this.element.remove();
-            return false;
         }
         this.element.style.bottom = `${this.positionY}px`;
         this.checkDestroy();
-
-
-        return true;
-
     }
 
     checkDestroy() {
         if (!this.active) {
             return;
         }
-        //console.log("shot", this.element, this.positionY);
 
-        const shot = this.element.getBoundingClientRect();
+        const shotRect = this.element.getBoundingClientRect();
+        // adjust shot hit area
+        const shotHitBox = {
+            left: shotRect.left,
+            right: shotRect.right - 5,
+            top: shotRect.top - 5,
+            bottom: shotRect.bottom
+        };
 
+        // check destroy enemy
         for (let enemy of gameStates.enemies) {
             const enemyRect = enemy.element.getBoundingClientRect();
 
-            if (!(
-                enemyRect.left > shot.right || enemyRect.right < shot.left ||
-                enemyRect.top > shot.bottom || enemyRect.bottom < shot.top
-            )) {
-                console.log("destroyed");
+            if (enemy.active &&
+                !(
+                    enemyRect.left > shotHitBox.right || enemyRect.right < shotHitBox.left ||
+                    enemyRect.top > shotHitBox.bottom || enemyRect.bottom < shotHitBox.top
+                )) {
                 this.active = false;
                 this.element.remove();
                 enemy.destroyed();
+                console.log("DESTROYED!")
+                return;
             }
         }
 
+        // check destroy UFO
         if (!gameStates.ufo) {
             return;
         }
         const ufoRect = gameStates.ufo.element.getBoundingClientRect();
         if (!(
-            ufoRect.left > shot.right || ufoRect.right < shot.left ||
-            ufoRect.top > shot.bottom || ufoRect.bottom < shot.top
+            ufoRect.left > shotHitBox.right || ufoRect.right < shotHitBox.left ||
+            ufoRect.top > shotHitBox.bottom || ufoRect.bottom < shotHitBox.top
         )) {
-            console.log("destroyed");
             this.active = false;
             this.element.remove();
             gameStates.ufo.destroyed();
