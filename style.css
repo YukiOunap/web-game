@@ -1,7 +1,7 @@
-body{
+body {
     display: flex;
     justify-content: center;
-    align-items: center;    
+    align-items: center;
     /* height: 100vh; */
     background-color: #000;
     font-family: 'OCR A Std', sans-serif;
@@ -57,8 +57,7 @@ body{
     left: 10px;
 }
 
-#pause-menu {
-    display: none;
+.menu {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -66,6 +65,15 @@ body{
     padding: 20px;
     text-align: center;
     background-color: transparent;
+    z-index: 10;
+}
+
+#start-menu {
+    display: block;
+}
+
+#pause-menu {
+    display: none;
 }
 
 .buttons {
@@ -75,26 +83,4 @@ body{
     background-color: transparent;
     font-size: 30px;
     color: lightcyan;
-}
-
-#player{
-    position: absolute;
-    margin-left: auto;
-    margin-right: auto;
-    bottom: 0px;
-    background-image: url('assets/textures/player.gif');
-    z-index: 10;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.bullet {
-    transform: rotate(90deg);
-    position: absolute;
-    width: 35px;
-    height: 35px;
-    background-image: url('assets/textures/bullet.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    z-index: 9;
 }

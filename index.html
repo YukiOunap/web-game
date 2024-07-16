@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,24 +8,36 @@
     <link rel="stylesheet" href="style.css">
     <title>Space Gliders</title>
 </head>
+
 <body>
     <div id="content-wrapper">
         <img src="assets/textures/background-logo.png" alt="Game logo" id="logo">
         <div id="game-container">
             <div id="background"></div>
             <div id="game">
-                <div id="pause-menu">
+                <div id="start-menu" class="menu">
+                    <button id="start-button" class="buttons">New Game</button><br>
+                </div>
+                <div id="pause-menu" class="menu">
                     <button id="restart-button" class="buttons">New Game</button><br>
                     <button id="continue-button" class="buttons">Continue</button>
                 </div>
+                <div id="game-over" class="menu">Game Over</div>
+                <div id="game-complete" class="menu">Mission Complete</div>
                 <div id="scoreboard">
                     <div id="timer">Time: 0</div>
                     <div id="score">Score: 0</div>
                     <div id="lives">Lives: 3</div>
                 </div>
+                <div id="player"></div>
             </div>
         </div>
-    </div>
-    <script src="game.js"></script>
+        <script type="module" src="game.js"></script>
+        <script type="module" src="player.js"></script>
+        <script type="module" src="shot.js"></script>
+        <script type="module" src="enemy.js"></script>
+        <script type="module" src="enemyShot.js"></script>
+        <script type="module" src="wall.js"></script>
 </body>
+
 </html>
