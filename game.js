@@ -13,6 +13,7 @@ const restartButton = document.getElementById('restart-button');
 const pauseMenu = document.getElementById('pause-menu');
 const startMenu = document.getElementById('start-menu');
 const startButton = document.getElementById('start-button');
+const backgroundMusic = document.getElementById('background-music');
 
 // UFO setting
 const ufoSpawnRate = 5;
@@ -158,6 +159,7 @@ function startGame() {
     isPaused = false;
     focusOnGame();
     lastTime = performance.now();
+    backgroundMusic.play();
     gameInterval = requestAnimationFrame(gameLoop);
     console.log("RESET!", gameInterval, gameStates);
 }
@@ -165,6 +167,7 @@ function startGame() {
 export function pauseGame() {
     isPaused = true;
     pauseMenu.style.display = "block";
+    backgroundMusic.pause()
     cancelAnimationFrame(gameInterval);
     unfocusOnGame();
 }
@@ -184,6 +187,7 @@ function unfocusOnGame() {
 // Game Over & Complete -------------------
 
 export async function gameOver(gameOverType) {
+    backgroundMusic.pause();
     const elem = document.getElementById(gameOverType);
     elem.style.display = "block";
     updateDisplays();

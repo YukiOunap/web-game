@@ -18,6 +18,11 @@ export class Enemy {
         this.direction = 1;
         this.active = true;
         this.init();
+
+
+        //boom sound
+        this.boomSound = new Audio('assets/music/boom.mp3')
+        this.winSound = new Audio('assets/music/win.mp3')
     }
 
     init() {
@@ -49,6 +54,10 @@ export class Enemy {
             return;
         }
 
+        //boom sound when destroyed
+
+        this.boomSound.play();
+
         // destroy this enemy (show explosion effect)
         this.active = false;
         this.element.style.backgroundImage = "url('assets/textures/explosion.gif')";
@@ -60,7 +69,9 @@ export class Enemy {
         gameStates.destroyedEnemies++;
 
         if (gameStates.destroyedEnemies == gameStates.numberOfEnemies) {
-            gameOver('game-complete');
+            gameOver('game-complete').then(() => {
+                this.winSound.play();
+            });
         }
     }
 

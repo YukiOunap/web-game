@@ -1,5 +1,6 @@
 import { Shot } from './shot.js';
-import { gameStates, gameOver } from './game.js';
+import { gameStates, gameOver, pauseGame } from './game.js';
+
 
 const gameArea = document.getElementById('game');
 
@@ -11,6 +12,9 @@ export class Player {
         this.height = this.element.clientHeight;
         this.bulletCoolDown = 400;
         this.playerSpeed = 300;
+
+        this.playerDeathSound = new Audio('assets/music/death.mp3')
+        this.playerHitSound = new Audio('assets/music/playerHit.mp3')
 
         this.init();
     }
@@ -69,12 +73,14 @@ export class Player {
         // check if new player respawn
         if (gameStates.lives == 0) {
             this.element.style.backgroundImage = "none";
-            gameOver('game-over');
+            this.playerDeathSound.play();
+            gameOver('game-over')
         } else {
             this.element.style.backgroundImage = "url('assets/textures/player.gif')";
             this.positionX = gameArea.clientWidth / 2;
             this.updatePosition();
             this.active = true;
+            this.playerHitSound.play();
         }
     }
 }

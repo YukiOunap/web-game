@@ -14,7 +14,10 @@ export class Shot {
         this.element.style.bottom = `${positionY}px`;
         this.active = true;
 
+        this.fireSound = new Audio('assets/music/fire.mp3');
+
         gameArea.appendChild(this.element);
+        this.fireSound.play();  
     }
 
     move(deltaTime) {
