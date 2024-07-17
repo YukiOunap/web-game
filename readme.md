@@ -1,34 +1,32 @@
-Hey! This is our game!
+# make-your-game
 
-Things to do:
-# Assets:
-- [ ] Textures for enemies, bullets, player __Ioann__
-- [ ] Textures for lives, score, timer(probably custom font?) __Ioann__
-- [ ] Textures for background __Ioann__
+- [make-your-game](#make-your-game)
+  - [Description](#description)
+  - [Usage](#usage)
+    - [How to start](#how-to-start)
+    - [How to play](#how-to-play)
+  - [Audit](#audit)
+  - [Authors](#authors)
 
-# Gameplay
-- [ ] *Gameloop* 60FPS __Yuki__
-- [ ] Player movement(<- (.player.) ->)__Yuki__
-- [ ] Shooting (<space>)__Yuki__
-- [ ] Enemies and their behaviour(dynamic spawn, dodging?)__Yuki__
+## Description
+Space Invader-like browser game implemented with JavaScript
 
-# Gameplay vol.2
-- [ ] Pause-menu (*continue, retry*) if gamearea is not selected === pause(when paused enemies do not spawn otherwise if frozen for a long time = gamebreak/freezes/crashes) __Ioann__
-- [ ] Score handling == (1shot=1score) __Ioann__
-- [ ] Collision with deadarea(behind the player screen)/player(-1 life) __Ioann__
+## Usage
 
-# Files
-.
-├── assets
-│   ├──textures
-│   ├──mp3
-├── game.js
-├── index.html
-├── readme.md
-└── style.css
+### How to start
 
+1. Get VSCode extension [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer):
+2. Open index.html on VSCode, right-click anywhere in the file and select "Open with Live Server".
+### How to play
+- Player movement ... Arrow keys
+- Shoot ... Space key
+- Pause game ... Esc / p / P keys
 
-# Project that we can work with
-[Dropbox](https://www.dropbox.com/scl/fo/d9h4rwbd06iwfpteexh64/ADnhLqf-NT7q0VbDnRBVxDQ?rlkey=uz3o5tkpd0hutri991n9k9a9d&st=7hdq52zz&dl=0)
-Or github public
-[Github](https://github.com/Run37927/spaceInvader/blob/main/index.js)
+## Audit
+Follow the instructions in the audit page: https://github.com/01-edu/public/tree/master/subjects/make-your-game
+
+## Authors
+
+- Ioann Tosjatsnikov
+
+- Yuki Kaneko
