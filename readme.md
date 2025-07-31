@@ -8,7 +8,7 @@ Space Invader-like browser game implemented with JavaScript
 - css
 - javascript
 
-### Installation & How to Use
+## Installation & How to Use
 
 This app is being hosted on Render. You can access https://web-game-ybnq.onrender.com and start trying.
 
